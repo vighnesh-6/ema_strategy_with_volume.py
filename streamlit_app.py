@@ -28,7 +28,7 @@ for ticker in stocks:
         data['EMA20'] = data['Close'].ewm(span=20).mean()
         data['EMA50'] = data['Close'].ewm(span=50).mean()
         data['EMA200'] = data['Close'].ewm(span=200).mean()
-        data['Volume_MA20'] = data['Volume'].rolling(20).mean().fillna(0)
+        data['Volume_MA20'] = data['Volume'].rolling(window=20).mean().fillna(0)
 
         # Signals
         data['Signal'] = 0
@@ -36,6 +36,8 @@ for ticker in stocks:
         data.loc[(data['EMA20'] < data['EMA50']) & (data['EMA20'].shift(1) >= data['EMA50'].shift(1)), 'Signal'] = -1
         vol, volma = data['Volume'].align(data['Volume_MA20'], join='inner',axis=0)
         data['VolumeSpike'] = vol > 2 * volma
+        data['VolumeSpike']=False
+        data.loc[vol_aligned.index, 'VolumeSpike']=vol_aligned > 2 * volma_aligned
 
 
         latest = data.iloc[-1]
