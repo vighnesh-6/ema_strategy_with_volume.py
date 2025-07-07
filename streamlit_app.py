@@ -38,12 +38,16 @@ for ticker in stocks:
         # Calculate volume moving average
         data['Volume_MA20'] = data['Volume'].rolling(20).mean()
 
-         # Volume spike detection with alignment fix
-        data['VolumeSpike'] = False  # Initialize the column with False
-        data['VolumeSpike'] = data['VolumeSpike'].astype(bool)
-        valid_index = data['Volume_MA20'].notna()
-        spike_index = data[valid_index]['Volume'] > 2 * data[valid_index]['Volume_MA20']
-        data.loc[spike_index.index, 'VolumeSpike'] = spike_index
+        # --- Calculate Volume Moving Average ---
+        data['Volume_MA20'] = data['Volume'].rolling(window=20).mean()
+
+        # --- Initialize VolumeSpike column ---
+        data['VolumeSpike'] = False
+
+        # --- Only compare where Volume_MA20 is not NaN ---
+        mask = data['Volume_MA20'].notna()
+        data.loc[mask, 'VolumeSpike'] = data.loc[mask, 'Volume'] > 2 * data.loc[mask, 'Volume_MA20']
+
 
 
         latest = data.iloc[-1]
