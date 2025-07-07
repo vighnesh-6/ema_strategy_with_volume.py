@@ -34,10 +34,12 @@ for ticker in stocks:
         data['Signal'] = 0
         data.loc[(data['EMA20'] > data['EMA50']) & (data['EMA20'].shift(1) <= data['EMA50'].shift(1)), 'Signal'] = 1
         data.loc[(data['EMA20'] < data['EMA50']) & (data['EMA20'].shift(1) >= data['EMA50'].shift(1)), 'Signal'] = -1
-        vol, volma = data['Volume'].align(data['Volume_MA20'], join='inner',axis=0)
-        data['VolumeSpike'] = vol > 2 * volma
-        data['VolumeSpike']=False
-        data.loc[vol_aligned.index, 'VolumeSpike']=vol_aligned > 2 * volma_aligned
+       
+        vol, volma = data['Volume'], data['Volume_MA20']
+        vol_aligned, volma_aligned = vol.align(volma, join='inner', axis=0)
+        spike_index = vol_aligned > 2 * volma_aligned
+        data['VolumeSpike'] = False
+        data.loc[spike_index.index, 'VolumeSpike'] = spike_index
 
 
         latest = data.iloc[-1]
