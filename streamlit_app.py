@@ -35,11 +35,21 @@ for ticker in stocks:
         data.loc[(data['EMA20'] > data['EMA50']) & (data['EMA20'].shift(1) <= data['EMA50'].shift(1)), 'Signal'] = 1
         data.loc[(data['EMA20'] < data['EMA50']) & (data['EMA20'].shift(1) >= data['EMA50'].shift(1)), 'Signal'] = -1
        
+        # Calculate volume moving average
+        data['Volume_MA20'] = data['Volume'].rolling(20).mean()
+
+        # Align to avoid operand errors
         vol, volma = data['Volume'], data['Volume_MA20']
         vol_aligned, volma_aligned = vol.align(volma, join='inner', axis=0)
+
+        # Detect volume spikes where volume is 2x the moving average
         spike_index = vol_aligned > 2 * volma_aligned
+
+        # Initialize full column to False
         data['VolumeSpike'] = False
-        data.loc[spike_index.index, 'VolumeSpike'] = spike_index
+
+        # Update only where index matches and spike is True
+        data.loc[spike_index[spike_index].index, 'VolumeSpike'] = True
 
 
         latest = data.iloc[-1]
