@@ -34,7 +34,7 @@ for ticker in stocks:
         data['Signal'] = 0
         data.loc[(data['EMA20'] > data['EMA50']) & (data['EMA20'].shift(1) <= data['EMA50'].shift(1)), 'Signal'] = 1
         data.loc[(data['EMA20'] < data['EMA50']) & (data['EMA20'].shift(1) >= data['EMA50'].shift(1)), 'Signal'] = -1
-        vol, volma = data['Volume'].align(data['Volume_MA20'], join='inner'axis=0)
+        vol, volma = data['Volume'].align(data['Volume_MA20'], join='inner',axis=0)
         data['VolumeSpike'] = vol > 2 * volma
 
 
